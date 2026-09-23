@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -45,7 +46,10 @@ date_default_timezone_set('Asia/Kolkata');
 require_once __DIR__ . '/config/paths.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/Http.php';
+require_once __DIR__ . '/core/Auth.php';
+require_once __DIR__ . '/core/Csrf.php';
 
+use Core\Auth;
 use Core\Paths;
 
 // ---------------------------------------------------------------
@@ -54,6 +58,26 @@ use Core\Paths;
 // Every other file uses Paths:: after this instead of its own
 // relative-path guesswork.
 Paths::init(__DIR__);
+
+// ---------------------------------------------------------------
+// 4b. Configure auth guards.
+// ---------------------------------------------------------------
+// Two independent guards, matching schema.sql exactly. Logging into
+// 'admin' has no effect on 'user' and vice versa — see core/Auth.php.
+Auth::configure([
+    'admin' => [
+        'table'           => 'admins',
+        'id_column'       => 'admin_id',
+        'password_column' => 'password_hash',
+        'active_column'   => 'is_active',
+    ],
+    'user' => [
+        'table'           => 'users',
+        'id_column'       => 'user_id',
+        'password_column' => 'password_hash',
+        'active_column'   => 'is_active',
+    ],
+]);
 
 // ---------------------------------------------------------------
 // 5. Optional .env loading — no Composer required.
